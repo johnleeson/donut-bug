@@ -5,24 +5,32 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Flappy Bird Clone</title>
     <style>
-        body { text-align: center; }
-        canvas { background: lightblue; }
+        * { margin: 0; padding: 0; overflow: hidden; }
+        body { text-align: center; background: lightblue; }
+        canvas { display: block; }
     </style>
 </head>
 <body>
-    <h1>Flappy Bird Clone</h1>
-    <canvas id="gameCanvas" width="400" height="500"></canvas>
-    
+    <canvas id="gameCanvas"></canvas>
+
     <script>
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
 
-        // Game variables
-        let bird = { x: 50, y: 150, width: 30, height: 30, velocity: 0, gravity: 0.5, jump: -8 };
+        // Set canvas to full window size
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener("resize", resizeCanvas);
+        resizeCanvas(); // Initial size setup
+
+        // Game variables (scaled for responsiveness)
+        let bird = { x: canvas.width * 0.1, y: canvas.height * 0.4, width: 40, height: 40, velocity: 0, gravity: 0.6, jump: -10 };
         let pipes = [];
-        let pipeWidth = 50;
-        let pipeGap = 120;
-        let pipeSpeed = 2;
+        let pipeWidth = canvas.width * 0.1; // 10% of screen width
+        let pipeGap = canvas.height * 0.25; // 25% of screen height
+        let pipeSpeed = 3;
         let score = 0;
         let gameOver = false;
 
@@ -76,7 +84,7 @@
             });
 
             // Add new pipes
-            if (pipes.length === 0 || pipes[pipes.length - 1].x < canvas.width - 200) {
+            if (pipes.length === 0 || pipes[pipes.length - 1].x < canvas.width - (canvas.width * 0.3)) {
                 let topHeight = Math.random() * (canvas.height - pipeGap - 50) + 20;
                 pipes.push({ x: canvas.width, topHeight });
             }
@@ -106,7 +114,7 @@
                 bird.velocity = bird.jump;
             } else {
                 // Restart game
-                bird.y = 150;
+                bird.y = canvas.height * 0.4;
                 bird.velocity = 0;
                 pipes = [];
                 score = 0;
@@ -116,9 +124,9 @@
 
         document.addEventListener("keydown", jump);
         document.addEventListener("click", jump);
+        document.addEventListener("touchstart", jump); // Mobile tap support
 
         gameLoop();
     </script>
 </body>
 </html>
-
