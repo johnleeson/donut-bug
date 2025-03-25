@@ -32,14 +32,29 @@
             velocity: 0, 
             gravity: 0.6, 
             jumpPower: -12, 
-            rotation: 0 
+            rotation: 0, 
+            jumpsLeft: 2 
         };
-        let groundHeight = 50;
-        let obstacles = [];
+        let terrain = [];
+        let terrainSpeed = 2;
+        let terrainWidth = 40;
+        let amplitude = 50; // Controls how steep the slopes are
+        let frequency = 0.02; // Controls wave pattern
         let obstacleWidth = 40;
         let obstacleSpeed = 5;
+        let obstacles = [];
         let score = 0;
         let gameOver = false;
+
+        function generateTerrain() {
+            terrain = [];
+            for (let i = 0; i < canvas.width / terrainWidth + 2; i++) {
+                let x = i * terrainWidth;
+                let y = canvas.height * 0.75 + Math.sin(i * frequency) * amplitude;
+                terrain.push({ x, y });
+            }
+        }
+        generateTerrain();
 
         function drawDonut() {
             ctx.save();
@@ -57,15 +72,21 @@
             ctx.restore();
         }
 
-        function drawGround() {
+        function drawTerrain() {
             ctx.fillStyle = "green";
-            ctx.fillRect(0, canvas.height - groundHeight, canvas.width, groundHeight);
+            ctx.beginPath();
+            ctx.moveTo(0, canvas.height);
+            terrain.forEach((point, i) => {
+                ctx.lineTo(point.x, point.y);
+            });
+            ctx.lineTo(canvas.width, canvas.height);
+            ctx.fill();
         }
 
         function drawObstacles() {
             ctx.fillStyle = "red";
             obstacles.forEach(obstacle => {
-                ctx.fillRect(obstacle.x, canvas.height - groundHeight - obstacle.height, obstacleWidth, obstacle.height);
+                ctx.fillRect(obstacle.x, obstacle.y - obstacle.height, obstacleWidth, obstacle.height);
             });
         }
 
@@ -82,10 +103,25 @@
             donut.velocity += donut.gravity;
             donut.y += donut.velocity;
 
-            // Rotate the donut as it moves
-            if (donut.y >= canvas.height - groundHeight - donut.radius) {
-                donut.y = canvas.height - groundHeight - donut.radius;
+            // Move terrain
+            terrain.forEach(point => {
+                point.x -= terrainSpeed;
+            });
+
+            // Generate new terrain when needed
+            if (terrain[0].x < -terrainWidth) {
+                terrain.shift();
+                let last = terrain[terrain.length - 1];
+                let newY = canvas.height * 0.75 + Math.sin((terrain.length + 1) * frequency) * amplitude;
+                terrain.push({ x: last.x + terrainWidth, y: newY });
+            }
+
+            // Check ground collision
+            let groundY = terrain.find(p => p.x >= donut.x)?.y || canvas.height;
+            if (donut.y >= groundY - donut.radius) {
+                donut.y = groundY - donut.radius;
                 donut.velocity = 0;
+                donut.jumpsLeft = 2; // Reset double jump
             } else {
                 donut.rotation += 0.1;
             }
@@ -98,7 +134,7 @@
                 if (
                     donut.x + donut.radius > obstacle.x &&
                     donut.x - donut.radius < obstacle.x + obstacleWidth &&
-                    donut.y + donut.radius > canvas.height - groundHeight - obstacle.height
+                    donut.y + donut.radius > obstacle.y - obstacle.height
                 ) {
                     gameOver = true;
                 }
@@ -112,14 +148,15 @@
 
             // Add new obstacles
             if (obstacles.length === 0 || obstacles[obstacles.length - 1].x < canvas.width - 300) {
+                let lastTerrainY = terrain[terrain.length - 1].y;
                 let height = Math.random() * 50 + 50; // Random obstacle height
-                obstacles.push({ x: canvas.width, height });
+                obstacles.push({ x: canvas.width, y: lastTerrainY, height });
             }
         }
 
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            drawGround();
+            drawTerrain();
             drawDonut();
             drawObstacles();
             drawScore();
@@ -138,14 +175,16 @@
         }
 
         function jump() {
-            if (!gameOver && donut.y >= canvas.height - groundHeight - donut.radius) {
+            if (!gameOver && donut.jumpsLeft > 0) {
                 donut.velocity = donut.jumpPower;
+                donut.jumpsLeft--;
             } else if (gameOver) {
                 // Restart game
                 donut.y = canvas.height * 0.7;
                 donut.velocity = 0;
                 donut.rotation = 0;
                 obstacles = [];
+                generateTerrain();
                 score = 0;
                 gameOver = false;
             }
