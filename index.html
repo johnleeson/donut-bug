@@ -25,6 +25,9 @@
         resizeCanvas(); 
 
         
+        const broccoliImg = new Image();
+        broccoliImg.src = "broccoli.png"; // Make sure the file is in the correct folder
+        
         // Load donut image
         const donutImg = new Image();
         donutImg.src = "donut.png";
@@ -82,9 +85,6 @@
             ctx.fill();
         }
 
-        const broccoliImg = new Image();
-        broccoliImg.src = "broccoli.png"; // Make sure the file is in the correct folder
-        
         function drawObstacles() {
             obstacles.forEach(obstacle => {
                 ctx.drawImage(broccoliImg, obstacle.x, obstacle.y, obstacle.width, obstacle.height);
