@@ -82,12 +82,21 @@
             ctx.fill();
         }
 
+        const broccoliImg = new Image();
+        broccoliImg.src = "broccoli.png"; // Make sure the file is in the correct folder
+        
         function drawObstacles() {
-            ctx.fillStyle = "red";
             obstacles.forEach(obstacle => {
-                ctx.fillRect(obstacle.x, obstacle.y - obstacle.height, obstacleWidth, obstacle.height);
+                ctx.drawImage(broccoliImg, obstacle.x, obstacle.y, obstacle.width, obstacle.height);
             });
         }
+
+        // function drawObstacles() {
+        //     ctx.fillStyle = "red";
+        //     obstacles.forEach(obstacle => {
+        //         ctx.fillRect(obstacle.x, obstacle.y - obstacle.height, obstacleWidth, obstacle.height);
+        //     });
+        // }
 
         function drawScore() {
             ctx.fillStyle = "black";
