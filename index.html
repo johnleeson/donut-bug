@@ -121,8 +121,12 @@
                 donut.y = groundY - donut.radius;
                 donut.velocity = 0;
                 donut.jumpsLeft = 2; // Reset double jump
+            
+                // Make the donut rotate based on movement
+                donut.rotation += terrainSpeed / donut.radius;
             } else {
-                donut.rotation += 0.1;
+                // Keep slow rotation in the air
+                donut.rotation += 0.05;
             }
 
             // Move obstacles
