@@ -24,6 +24,11 @@
         window.addEventListener("resize", resizeCanvas);
         resizeCanvas(); 
 
+        
+        // Load donut image
+        const donutImg = new Image();
+        donutImg.src = "donut.png";
+        
         // Game variables
         let donut = { 
             x: canvas.width * 0.1, 
@@ -56,19 +61,13 @@
         }
         generateTerrain();
 
-        function drawDonut() {
+         function drawDonut() {
             ctx.save();
             ctx.translate(donut.x, donut.y);
             ctx.rotate(donut.rotation);
-            ctx.fillStyle = "brown";
-            ctx.beginPath();
-            ctx.arc(0, 0, donut.radius, 0, Math.PI * 2);
-            ctx.fill();
 
-            ctx.fillStyle = "white"; // Donut hole
-            ctx.beginPath();
-            ctx.arc(0, 0, donut.radius * 0.4, 0, Math.PI * 2);
-            ctx.fill();
+            ctx.drawImage(donutImg, -donut.radius, -donut.radius, donut.radius * 2, donut.radius * 2);
+
             ctx.restore();
         }
 
