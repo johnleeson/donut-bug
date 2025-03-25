@@ -3,10 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flappy Bird Clone</title>
+    <title>Rolling Donut Game</title>
     <style>
         * { margin: 0; padding: 0; overflow: hidden; }
-        body { text-align: center; background: lightblue; }
+        body { background: lightblue; }
         canvas { display: block; }
     </style>
 </head>
@@ -17,33 +17,55 @@
         const canvas = document.getElementById("gameCanvas");
         const ctx = canvas.getContext("2d");
 
-        // Set canvas to full window size
         function resizeCanvas() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
         }
         window.addEventListener("resize", resizeCanvas);
-        resizeCanvas(); // Initial size setup
+        resizeCanvas(); 
 
-        // Game variables (scaled for responsiveness)
-        let bird = { x: canvas.width * 0.1, y: canvas.height * 0.4, width: 40, height: 40, velocity: 0, gravity: 0.6, jump: -10 };
-        let pipes = [];
-        let pipeWidth = canvas.width * 0.1; // 10% of screen width
-        let pipeGap = canvas.height * 0.25; // 25% of screen height
-        let pipeSpeed = 3;
+        // Game variables
+        let donut = { 
+            x: canvas.width * 0.1, 
+            y: canvas.height * 0.7, 
+            radius: 30, 
+            velocity: 0, 
+            gravity: 0.6, 
+            jumpPower: -12, 
+            rotation: 0 
+        };
+        let groundHeight = 50;
+        let obstacles = [];
+        let obstacleWidth = 40;
+        let obstacleSpeed = 5;
         let score = 0;
         let gameOver = false;
 
-        function drawBird() {
-            ctx.fillStyle = "yellow";
-            ctx.fillRect(bird.x, bird.y, bird.width, bird.height);
+        function drawDonut() {
+            ctx.save();
+            ctx.translate(donut.x, donut.y);
+            ctx.rotate(donut.rotation);
+            ctx.fillStyle = "brown";
+            ctx.beginPath();
+            ctx.arc(0, 0, donut.radius, 0, Math.PI * 2);
+            ctx.fill();
+
+            ctx.fillStyle = "white"; // Donut hole
+            ctx.beginPath();
+            ctx.arc(0, 0, donut.radius * 0.4, 0, Math.PI * 2);
+            ctx.fill();
+            ctx.restore();
         }
 
-        function drawPipes() {
+        function drawGround() {
             ctx.fillStyle = "green";
-            pipes.forEach(pipe => {
-                ctx.fillRect(pipe.x, 0, pipeWidth, pipe.topHeight);
-                ctx.fillRect(pipe.x, pipe.topHeight + pipeGap, pipeWidth, canvas.height - pipe.topHeight - pipeGap);
+            ctx.fillRect(0, canvas.height - groundHeight, canvas.width, groundHeight);
+        }
+
+        function drawObstacles() {
+            ctx.fillStyle = "red";
+            obstacles.forEach(obstacle => {
+                ctx.fillRect(obstacle.x, canvas.height - groundHeight - obstacle.height, obstacleWidth, obstacle.height);
             });
         }
 
@@ -56,44 +78,50 @@
         function updateGame() {
             if (gameOver) return;
 
-            bird.velocity += bird.gravity;
-            bird.y += bird.velocity;
+            // Apply gravity
+            donut.velocity += donut.gravity;
+            donut.y += donut.velocity;
 
-            if (bird.y + bird.height > canvas.height) {
-                gameOver = true;
+            // Rotate the donut as it moves
+            if (donut.y >= canvas.height - groundHeight - donut.radius) {
+                donut.y = canvas.height - groundHeight - donut.radius;
+                donut.velocity = 0;
+            } else {
+                donut.rotation += 0.1;
             }
 
-            // Move pipes
-            pipes.forEach((pipe, index) => {
-                pipe.x -= pipeSpeed;
+            // Move obstacles
+            obstacles.forEach((obstacle, index) => {
+                obstacle.x -= obstacleSpeed;
 
                 // Check collision
                 if (
-                    bird.x < pipe.x + pipeWidth &&
-                    bird.x + bird.width > pipe.x &&
-                    (bird.y < pipe.topHeight || bird.y + bird.height > pipe.topHeight + pipeGap)
+                    donut.x + donut.radius > obstacle.x &&
+                    donut.x - donut.radius < obstacle.x + obstacleWidth &&
+                    donut.y + donut.radius > canvas.height - groundHeight - obstacle.height
                 ) {
                     gameOver = true;
                 }
 
-                // Remove pipes & update score
-                if (pipe.x + pipeWidth < 0) {
-                    pipes.splice(index, 1);
+                // Remove passed obstacles & update score
+                if (obstacle.x + obstacleWidth < 0) {
+                    obstacles.splice(index, 1);
                     score++;
                 }
             });
 
-            // Add new pipes
-            if (pipes.length === 0 || pipes[pipes.length - 1].x < canvas.width - (canvas.width * 0.3)) {
-                let topHeight = Math.random() * (canvas.height - pipeGap - 50) + 20;
-                pipes.push({ x: canvas.width, topHeight });
+            // Add new obstacles
+            if (obstacles.length === 0 || obstacles[obstacles.length - 1].x < canvas.width - 300) {
+                let height = Math.random() * 50 + 50; // Random obstacle height
+                obstacles.push({ x: canvas.width, height });
             }
         }
 
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            drawBird();
-            drawPipes();
+            drawGround();
+            drawDonut();
+            drawObstacles();
             drawScore();
 
             if (gameOver) {
@@ -110,13 +138,14 @@
         }
 
         function jump() {
-            if (!gameOver) {
-                bird.velocity = bird.jump;
-            } else {
+            if (!gameOver && donut.y >= canvas.height - groundHeight - donut.radius) {
+                donut.velocity = donut.jumpPower;
+            } else if (gameOver) {
                 // Restart game
-                bird.y = canvas.height * 0.4;
-                bird.velocity = 0;
-                pipes = [];
+                donut.y = canvas.height * 0.7;
+                donut.velocity = 0;
+                donut.rotation = 0;
+                obstacles = [];
                 score = 0;
                 gameOver = false;
             }
