@@ -96,13 +96,13 @@
                     obstacle.height = 50;
                 }
                 console.log("Drawing obstacle at:", obstacle.x, obstacle.y);
-                ctx.strokeStyle = "blue";
-                ctx.strokeRect(obstacle.x, obstacle.y - obstacle.height, obstacle.width, obstacle.height);
+                // ctx.strokeStyle = "blue";
+                // ctx.strokeRect(obstacle.x, obstacle.y - obstacle.height, obstacle.width, obstacle.height);
 
                 ctx.drawImage(broccoliImg, obstacle.x, obstacle.y - obstacle.height, obstacle.width, obstacle.height);
                 
-                ctx.fillStyle = "red";
-                ctx.fillRect(obstacle.x, obstacle.y - obstacle.height, 5, 5);
+                // ctx.fillStyle = "red";
+                // ctx.fillRect(obstacle.x, obstacle.y - obstacle.height, 5, 5);
 
             });
         }
