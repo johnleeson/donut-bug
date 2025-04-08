@@ -100,6 +100,10 @@
                 ctx.strokeRect(obstacle.x, obstacle.y - obstacle.height, obstacle.width, obstacle.height);
 
                 ctx.drawImage(broccoliImg, obstacle.x, obstacle.y - obstacle.height, obstacle.width, obstacle.height);
+                
+                ctx.fillStyle = "red";
+                ctx.fillRect(obstacle.x, obstacle.y - obstacle.height, 5, 5);
+
             });
         }
 
@@ -174,7 +178,7 @@
             if (obstacles.length === 0 || obstacles[obstacles.length - 1].x < canvas.width - 300) {
                 let lastTerrainY = terrain[terrain.length - 1].y;
                 let height = Math.random() * 50 + 50; // Random obstacle height
-                obstacles.push({ x: canvas.width, y: lastTerrainY, height });
+                obstacles.push({ x: canvas.width, y: lastTerrainY, height, width: 50 });
             }
         }
 
