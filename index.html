@@ -186,7 +186,9 @@
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             drawTerrain();
             drawDonut();
-            drawObstacles();
+             if (!gameOver) {
+                drawObstacles();
+            }
             drawScore();
 
             if (gameOver) {
