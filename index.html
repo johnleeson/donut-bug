@@ -96,7 +96,7 @@
                     obstacle.height = 50;
                 }
                 console.log("Drawing obstacle at:", obstacle.x, obstacle.y);
-                ctx.drawImage(broccoliImg, obstacle.x, obstacle.y, obstacle.width, obstacle.height);
+                ctx.drawImage(broccoliImg, obstacle.x, obstacle.y - obstacle.height, obstacle.width, obstacle.height);
             });
         }
 
