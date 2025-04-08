@@ -25,8 +25,12 @@
         resizeCanvas(); 
 
         
-        const broccoliImg = new Image();
-        broccoliImg.src = "broccoli.png"; // Make sure the file is in the correct folder
+       const broccoliImg = new Image();
+        broccoliImg.src = "broccoli.png";
+        
+        broccoliImg.onload = function () {
+            console.log("Broccoli image loaded!"); // Debugging check
+        };
         
         // Load donut image
         const donutImg = new Image();
