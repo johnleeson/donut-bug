@@ -89,6 +89,20 @@
             ctx.fill();
         }
 
+        function drawGrassBlades() {
+            ctx.strokeStyle = "darkgreen";
+            terrain.forEach(point => {
+                // Draw a few random grass blades at each point
+                for (let i = 0; i < 3; i++) {
+                    let offsetX = Math.random() * 10 - 5;
+                    let height = Math.random() * 10 + 5;
+                    ctx.beginPath();
+                    ctx.moveTo(point.x + offsetX, point.y);
+                    ctx.lineTo(point.x + offsetX, point.y - height);
+                    ctx.stroke();
+                }
+            });
+        }
         function drawObstacles() {
             obstacles.forEach(obstacle => {
                 if (obstacle.width === 0 || obstacle.height === 0) {
@@ -185,6 +199,7 @@
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             drawTerrain();
+            drawGrassBlades();
             drawDonut();
              if (!gameOver) {
                 drawObstacles();
